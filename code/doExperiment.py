@@ -120,7 +120,7 @@ class Experiment:
         
         paras = {
             "Random Assignment": {},
-            "Logit": {"penalty": ["l2", "none"]},
+            "Logit": {"penalty": ["l2", None]},
             "RandomForest": {"max_depth": [2,4,6]},
             "ExtraTrees": {"max_depth": [2,4,6]},
             "SVM": {"gamma": ["scale", "auto"], "kernel": ["rbf", "linear", "poly", "sigmoid"]},
