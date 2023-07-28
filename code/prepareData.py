@@ -150,6 +150,7 @@ class Data:
         self.df = self.df[self.df.remove == 0].dropna()
         self.df = self.df[self.varlist]
         self.df = self.df[self.df.year <= self.years[-1] - self.predHor]
+        self.name = name
         self.reloadParameters()
         self.isReady = True
         print(f"{name}: The final dataset contains {self.len} observations with {self.crisisCount} distinct crisis events.")

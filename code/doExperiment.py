@@ -68,7 +68,7 @@ class Experiment:
         self.iterator = iteratorTypes[self.expType]
         
     
-    def run(self, n = 1):
+    def run(self, n = 1, disableTqdm = False):
         self.roc = pd.DataFrame()
         self.auc = pd.DataFrame()
         self.searchRes = []
@@ -81,7 +81,7 @@ class Experiment:
             predictions = []
             
             # Repeat Experiment n times and compute Average
-            for i in tqdm(range(1, n+1), desc = model):
+            for i in tqdm(range(1, n+1), desc = self.data.name + ": " + model, disable = disableTqdm):
                 
                 # Calculate Predictions for every Train/Test Fold 
                 for ixTrain, ixTest in self.iterator.split(self.data.df):
@@ -106,7 +106,7 @@ class Experiment:
             foldAUC = metrics.roc_auc_score(yTrue, predictions)
             self.auc = pd.concat((
                 self.auc,
-                pd.DataFrame({"Model": [model], "AUC": foldAUC})
+                pd.DataFrame({"Set": self.data.name,"Model": [model], "AUC": foldAUC})
             )) 
         self.auc = self.auc.sort_values("AUC", ascending = False).reset_index(drop=True)
         self.roc = self.roc.reset_index(drop = True)
@@ -120,7 +120,7 @@ class Experiment:
         
         paras = {
             "Random Assignment": {},
-            "Logit": {"penalty": ["l2", None]},
+            "Logit": {"penalty": ["l2", "none"]},
             "RandomForest": {"max_depth": [2,4,6]},
             "ExtraTrees": {"max_depth": [2,4,6]},
             "SVM": {"gamma": ["scale", "auto"], "kernel": ["rbf", "linear", "poly", "sigmoid"]},
