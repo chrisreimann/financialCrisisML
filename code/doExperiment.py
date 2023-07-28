@@ -3,7 +3,7 @@ SUPPLEMENTARY CODE FOR
 Title: Using Machine Learning to predict Financial Crises: An Evaluation of different Learning Algorithms for Early Warning Models.
 Author: Chris Reimann.
 
-This file implements the experimental design and calculates the performance metrics of specified ML models. 
+This file implements the experimental design and calculates the performance metrics of the specified ML models. 
 """
 
 import prepareData as pds
