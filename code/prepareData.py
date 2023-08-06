@@ -8,6 +8,9 @@ This file loads and processes the crisis event and early warning indicator data.
 import pandas as pd
 import numpy as np
 import altCrisisData as ac
+import seaborn as sn
+import matplotlib.pyplot as plt
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 class Data:
     def __init__(self, indicators = [], folder = None, crisisData = "MacroHistory", predHor = 2, postCrisis = 4, diffHor = 5, delWW = True):
@@ -145,13 +148,33 @@ class Data:
     def getData(self, ix):
         return self.df.loc[ix]
    
-              
-    def getReady(self, name): # Make Data Ready for Model Input
+    def standardize(self):
+        df = self.df.copy()
+        for indicator in self.indicators:
+            mean = self.df[indicator].mean()
+            std = self.df[indicator].std()
+            df[indicator] = (self.df[indicator] - mean) / std
+        return df
+    
+    def correlationMatrix(self):
+        corr = self.df[self.indicators].corr(method = "pearson").abs()
+        sn.set(rc={'figure.figsize':(11.5,8)})
+        sn.heatmap(corr, annot=True, cmap = "flare")
+
+    def vif(self):
+        vif_df = pd.DataFrame()
+        vif_df['variable'] = self.indicators
+        vif_df['VIF'] = [variance_inflation_factor(self.df[self.indicators], i) for i in range(len(self.indicators))]
+        return vif_df.sort_values("VIF", ascending = False)
+    
+    # Make Data Ready for Model Input
+    def getReady(self, name): 
         self.df = self.df[self.df.remove == 0].dropna()
         self.df = self.df[self.varlist]
         self.df = self.df[self.df.year <= self.years[-1] - self.predHor]
         self.name = name
         self.reloadParameters()
+        
         self.isReady = True
         print(f"{name}: The final dataset contains {self.len} observations with {self.crisisCount} distinct crisis events.")
         return self
