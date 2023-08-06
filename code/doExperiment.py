@@ -28,6 +28,8 @@ from sklearn.dummy import DummyClassifier
 from utils import CustomGroupKFold, CustomTimeSeriesSplit, InSampleSplit
 from tqdm.notebook import tqdm
 import statsmodels.api as sm
+from alibi.explainers import ALE
+from alibi.explainers import plot_ale
 
 class Experiment:
     
@@ -165,7 +167,39 @@ class Experiment:
         
         
     def logitCoef(self):
-        mod = sm.Logit(self.data.df[self.data.depVar], self.data.df[self.data.indicators])
+        df_std = self.data.standardize()
+        exogWConst = sm.add_constant(df_std[self.data.indicators])
+        mod = sm.Logit(df_std[self.data.depVar], exogWConst)
         fii = mod.fit()
         coef = fii.summary2().tables[1]
+        
+        for var in coef.index:
+            if coef[coef.index == var]["P>|z|"].values[0] < 0.01:
+                print(f"{var} is significant at 1%")
+            elif coef[coef.index == var]["P>|z|"].values[0] < 0.05:
+                print(f"{var} is significant at 5%")
+            elif coef[coef.index == var]["P>|z|"].values[0] < 0.1:
+                print(f"{var} is significant at 10%")
         return coef
+        
+    def ALE(self, modelType, var):
+        df_std = self.data.standardize()
+        x = df_std[self.data.indicators].to_numpy()
+        y = df_std[self.data.depVar].to_numpy()
+
+        for paras in self.searchRes:
+            if paras[0] == modelType:
+                model = self.modelClasses[modelType].set_params(**paras[1])
+                break
+        print(model)
+        model.fit(x,y)
+
+        pred = model.predict_proba(x)[:,1]
+        fpr, tpr, threshold = metrics.roc_curve(y, pred)
+        print(f"AUC: {metrics.auc(fpr, tpr)}")
+
+        predict_crisis = lambda x: model.predict_proba(x)[:,1]
+
+        ale = ALE(predict_crisis, feature_names = self.data.indicators)
+        exp = ale.explain(x, features = var)
+        plot_ale(exp, n_cols = 4, fig_kw={'figwidth':18, 'figheight': 14})
