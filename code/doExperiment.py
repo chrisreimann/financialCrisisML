@@ -68,7 +68,7 @@ class Experiment:
             "Forecast": CustomTimeSeriesSplit(),
         }
         self.iterator = iteratorTypes[self.expType]
-        
+
     
     def run(self, n = 1, disableTqdm = False):
         self.roc = pd.DataFrame()
@@ -182,24 +182,37 @@ class Experiment:
                 print(f"{var} is significant at 10%")
         return coef
         
-    def ALE(self, modelType, var):
+    def ALE(self, modelTypes, var):
         df_std = self.data.standardize()
         x = df_std[self.data.indicators].to_numpy()
         y = df_std[self.data.depVar].to_numpy()
 
-        for paras in self.searchRes:
-            if paras[0] == modelType:
-                model = self.modelClasses[modelType].set_params(**paras[1])
-                break
-        print(model)
-        model.fit(x,y)
+        exps = {}
+        for modelType in modelTypes:
+            # Load Parameters from Hyperparameter Search
+            try:
+                for paras in self.searchRes:
+                    if paras[0] == modelType:
+                        model = self.modelClasses[modelType].set_params(**paras[1])
+                        break
+                print(model)
+                model.fit(x,y)
+            except AttributeError:
+                raise ValueError("No Hyperparameter Search has been conducted yet. Please use .run() first.")
 
-        pred = model.predict_proba(x)[:,1]
-        fpr, tpr, threshold = metrics.roc_curve(y, pred)
-        print(f"AUC: {metrics.auc(fpr, tpr)}")
+            # Print AUROC
+            pred = model.predict_proba(x)[:,1]
+            fpr, tpr, threshold = metrics.roc_curve(y, pred)
+            print(f"AUC: {metrics.auc(fpr, tpr)}")
 
-        predict_crisis = lambda x: model.predict_proba(x)[:,1]
+            # Get Prediction Function for ALE
+            predict_crisis = lambda x: model.predict_proba(x)[:,1]
+            ale = ALE(predict_crisis, feature_names = list(map(self.data.varNames.get, self.data.indicators)))
+            exps[modelType] = ale.explain(x, features = var)
 
-        ale = ALE(predict_crisis, feature_names = self.data.indicators)
-        exp = ale.explain(x, features = var)
-        plot_ale(exp, n_cols = 4, fig_kw={'figwidth':18, 'figheight': 14})
+        sns.set_theme()    
+        fig, ax = plt.subplots(nrows = 5, ncols = 3, figsize = (12,16))
+        for model in exps.keys():
+            plot_ale(exps[model], n_cols = 4, ax=ax, line_kw={"label": model})
+    
+        

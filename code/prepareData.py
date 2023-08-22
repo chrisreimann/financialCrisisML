@@ -32,6 +32,24 @@ class Data:
         self.len = None
         self.crisisCount = None
         self.isReady = False 
+
+        # Variable Names
+        self.varNames = {
+            "rconsbarro": "Consumption",
+            "iy": "Investment",
+            "money": "Broad Money",
+            "xrusd": "USD Exchange Rate",
+            "cpi": "Consumer Price Index",
+            "ca": "Current Account",
+            "tloans": "Loans (local)",
+            "debtServ": "Debt Service Ratio",
+            "yieldCurve": "Yield Curve (local)",
+            "ltd": "Banks LDR",
+            "debtgdp": "Public Debt",
+            "globaltloans": "Loans (global)",
+            "globalyieldCurve": "Yield Curve (global)",
+            "hpnom": "House Prices"
+        }
         
         # Implement Indicator Variables
         if type(self.indicators) != list: self.indicators = [self.indicators]
