@@ -210,7 +210,7 @@ class Experiment:
             ale = ALE(predict_crisis, feature_names = list(map(self.data.varNames.get, self.data.indicators)))
             exps[modelType] = ale.explain(x, features = var)
 
-        sns.set_theme()    
+        sns.set_theme(style="whitegrid")    
         fig, ax = plt.subplots(nrows = 5, ncols = 3, figsize = (12,16))
         for model in exps.keys():
             plot_ale(exps[model], n_cols = 4, ax=ax, line_kw={"label": model})
