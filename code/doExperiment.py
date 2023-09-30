@@ -210,9 +210,13 @@ class Experiment:
             ale = ALE(predict_crisis, feature_names = list(map(self.data.varNames.get, self.data.indicators)))
             exps[modelType] = ale.explain(x, features = var)
 
-        sns.set_theme(style="whitegrid")    
+        sns.set_theme(style="whitegrid", palette="tab10")    
         fig, ax = plt.subplots(nrows = 5, ncols = 3, figsize = (12,16))
+        plots = {}
         for model in exps.keys():
-            plot_ale(exps[model], n_cols = 4, ax=ax, line_kw={"label": model})
-    
+            plots[model] = plot_ale(exps[model], n_cols = 4, ax=ax, line_kw={"label": model})
+        fig.delaxes(ax[4,2])
+        ax[0,0].get_legend().remove()
+        handles, labels = ax[0,0].get_legend_handles_labels()
+        fig.legend(handles, labels, loc = "lower right", bbox_to_anchor=(0.83,0.145))
         
