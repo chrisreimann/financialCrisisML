@@ -147,8 +147,7 @@ class Experiment:
     
     
     def rocGraph(self, save = False):
-        sns.set_theme(style = "whitegrid", palette = "dark")
-        sns.set(rc={'savefig.dpi':300})
+        sns.set_theme(style="whitegrid", palette="tab10", rc={'savefig.dpi':300})
         plt.figure(figsize=(6,6))
         
         plot = sns.lineplot(
