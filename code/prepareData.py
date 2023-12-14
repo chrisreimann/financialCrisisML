@@ -1,6 +1,6 @@
 """
 SUPPLEMENTARY CODE FOR
-Title: Using Machine Learning to predict Financial Crises: An Evaluation of different Learning Algorithms for Early Warning Models.
+Title: Predicting Financial Crises - An Evaluation of Machine Learning Algorithms and Model Explainability for Early Warning Systems.
 Author: Chris Reimann.
 This file loads and processes the crisis event and early warning indicator data. 
 """
