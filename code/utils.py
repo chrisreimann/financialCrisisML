@@ -85,7 +85,7 @@ class InSampleSplit():
     
 
 class forecastExp():
-    def __init__(self, year = 1980):
+    def __init__(self, year):
         self.n_splits = 1
         self.year = year
 
