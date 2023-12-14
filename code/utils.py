@@ -84,4 +84,21 @@ class InSampleSplit():
         return [[ix, ix]]
     
 
+class forecastExp():
+    def __init__(self, year = 1980):
+        self.n_splits = 1
+        self.year = year
+
+
+    def get_n_splits(self, x=None, y=None, groups = None):
+        return self.n_splits
+    
+    def split(self, data, y=None, groups=None):
+        if type(data) == np.ndarray:
+            data = pd.DataFrame(data)
+
+        ixPre = data[data.year <= self.year].index
+        ixPost = data[data.year > self.year].index
+
+        return [[ixPre, ixPost]]
     

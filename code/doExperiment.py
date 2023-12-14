@@ -25,7 +25,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.compose import ColumnTransformer
 from sklearn.dummy import DummyClassifier
-from utils import CustomGroupKFold, CustomTimeSeriesSplit, InSampleSplit
+from utils import CustomGroupKFold, CustomTimeSeriesSplit, InSampleSplit, forecastExp
 from tqdm.notebook import tqdm
 import statsmodels.api as sm
 from alibi.explainers import ALE
@@ -65,7 +65,7 @@ class Experiment:
         iteratorTypes = {
             "InSample": InSampleSplit(),
             "CrossVal": CustomGroupKFold(),
-            "Forecast": CustomTimeSeriesSplit(),
+            "Forecast": forecastExp(year = 1980)
         }
         self.iterator = iteratorTypes[self.expType]
 
